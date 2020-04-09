@@ -1,3 +1,5 @@
+#ifndef QUEUE_H
+#define QUEUE_H
 // Queue template class
 
 #include <cstddef>
@@ -14,7 +16,6 @@ class Queue
 
         Node* head;
         Node* tail;
-	    // Node* temp;
         
 	public:
 		Queue();
@@ -26,13 +27,22 @@ class Queue
         ~Queue();
 };
 
+/******************* Queue Constructor **********************
+Input: none
+Output: none
+*************************************************************/
+
 template <class T>
 Queue<T>::Queue()
 {
 	head = NULL;
 	tail = NULL;
-	// temp = NULL;
 }
+
+/********************** Enqueue *****************************
+Input: datum
+Output: enqueue a new node
+*************************************************************/
 
 template <class T> 
 void Queue<T>::Enqueue(const T datum)
@@ -52,10 +62,15 @@ void Queue<T>::Enqueue(const T datum)
 	}
 }
 
+/********************** Dequeue *****************************
+Input: none
+Output: returns datum stored in the node that was dequeued
+*************************************************************/
+
 template <class T>
 T Queue<T>::Dequeue()
 {
-    struct Node * temp = new Node();
+    struct Node * temp;
 	T return_Datum;
 
 	return_Datum = head->datum;
@@ -66,6 +81,11 @@ T Queue<T>::Dequeue()
 	return return_Datum;
 }
 
+/************************ Front *****************************
+Input: none
+Output: return the datum that is the front
+*************************************************************/
+
 template <class T>
 T Queue<T>::Front()
 {
@@ -74,46 +94,49 @@ T Queue<T>::Front()
 	return return_Datum;
 }
 
+/************************ isEmpty ***************************
+Input: none
+Output: checks if the queue is empty or not
+*************************************************************/
+
 template <class T>
 bool Queue<T>::isEmpty()
 {
   return (!tail);
 }
 
+/************************* Size *****************************
+Input: none
+Output: returns the size in the queue
+*************************************************************/
+
 template <class T>
 int Queue<T>::Size()
 {
-	int count = 0;
-    struct Node * temp = new Node();
+	struct Node *temp;
 	temp = head;
+	int count = 0;
 	
-	if (isEmpty())
-    {
-		return count;	
-	}
-	else if (temp->next == NULL)
-    {
+	while(temp){
 		count++;
-		return count;
+		temp = temp->next;
 	}
-	else
-    {
-		while (temp != NULL)
-        {
-			count++;
-			temp = temp->next;
-		}
-		
-	    return count;
-	}
+	return count;
 }
+
+/************************ Queue Destructor ******************
+Input: none
+Output: none
+*************************************************************/
 
 template <class T>
 Queue<T>::~Queue(){
-    Node* temp;
-    while(head){       
-        temp=head->next;
-        delete head;
-        head = temp;
+	tail = head;
+    while(tail){
+        head = tail->next;
+        delete tail;
+        tail = head;
     }
 }
+
+#endif

@@ -6,42 +6,48 @@ class semaphore;
 #include <pthread.h>
 
 #include "tcb.h"
+#include "UltimaWindows.h"
+#include "ipc.h"
+#include "memoryManager.h"
 
-extern pthread_mutex_t proc_mutex;
-extern pthread_mutex_t mutex;
+class scheduler
+{
+private:
+	bool clean;
+	bool deadlock;
+	time_t startTime;
+	int quantum;
+	TCB *process_table;
 
-class scheduler{
-    private:
-		//TCB *process_table;
-		//int nextPID;
-		bool clean;
-		bool deadlock;
-		time_t startTime;
-		int quantum;
-		//semaphore *io;
-    public:
-		pthread_mutex_t proc_mutex;
-		TCB *process_table;
-		semaphore *io;
-		int nextPID;
-	
-		scheduler();
-        pthread_mutex_t procMutex();
-        void create_task(std::string name);
-		void create_lazy_task(std::string name);
-        void destroy_task(int dPID);
-        //static void *thread_function(void *);
-        bool yield();
-        void rotate(char state);
-        void cleanup();
-        bool getDL();
-        void block();
-        void blockPID(int bPID);
-        bool unblockPID(int ubPID);
-        std::string dump();
-        ~scheduler();
+public:
+	ipc *sched_ipc;
+	pthread_mutex_t proc_mutex;
+	semaphore *io;
+	int nextPID;
+	UltimaWindows sched_windows; // potentially for easier creation
+	memoryManager *memory_manager;
 
-    friend class semaphore;
+	TCB *getProcessTable();
+	scheduler();
+	void start();
+	pthread_mutex_t procMutex();
+	void create_task(std::string name);
+	void create_lazy_task(std::string name);
+	bool destroy_task(int dPID);
+	bool yield();
+	void rotate(char state);
+	bool cleanup();
+	bool getDL();
+	void block();
+	void blockByPID(int bPID);
+	bool unblockByPID(int ubPID);
+	void wait_turn(scheduler *sched_ptr, thread *thread_ptr, bool blocked = false);
+	time_t getTime();
+	std::string dump();
+	~scheduler();
+
+	friend class semaphore;
+	//friend class ipc;
 };
 
 #endif

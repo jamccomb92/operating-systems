@@ -1,4 +1,4 @@
-#include "windows.h"
+#include "UltimaWindows.h"
 
 
 /************* UltimaWindow Constructor **********************
@@ -17,10 +17,17 @@ UltimaWindows::UltimaWindows(){
     max_y = 82;
     start_x = 2;
     start_y = 11;
-    thread_height = 20;
+    thread_height = 15;
     thread_width = 32;
     log_console_y = 0;
-    WINDOW* headingWin = create_heading_win();
+    message_start_y = 47;
+    message_start_x = 2;
+    message_width = 98;
+    message_height = 30;
+    headingWin = create_heading_win();
+    consoleWin = create_console_window();
+    logWin = create_log_window();
+    messageWin = create_message_window();
 }
 /************* UltimaWindow Constructor **********************
 Input: height, widthm, start_x, start_y
@@ -81,7 +88,7 @@ WINDOW* UltimaWindows::create_heading_win(){
     mvwprintw(Heading_Win, 7, 2, "Starting Thread 3....");
     mvwprintw(Heading_Win, 9, 2, "Press 'q' or Ctrl-C to exit the program..."); 
     mvwprintw(Heading_Win, 4, 65, " --- Console Commands ---");
-    mvwprintw(Heading_Win, 5, 65, "p -- Pause Logging Window");
+    mvwprintw(Heading_Win, 5, 65, "p -- (Un)Pause Logging Window");
     mvwprintw(Heading_Win, 6, 65, "h -- Display Help");
     mvwprintw(Heading_Win, 7, 65, "q -- Quit the Program");
 
@@ -99,12 +106,13 @@ WINDOW* UltimaWindows::create_log_window(){
     // check if start_x is at a new line
     // the y start for the console and log will be the same as start y
     // otherwise we will move the log and console to the next approppriate y position
-    if(start_x == 2){
-        log_console_y = start_y;
-    }
-    else{
-        log_console_y = start_y + thread_height;
-    }
+    // if(start_x == 2){
+    //     log_console_y = start_y;
+    // }
+    // else{
+    //     log_console_y = start_y + thread_height;
+    // }
+    log_console_y = 27;
 
     WINDOW * Log_Win = create_window(console_log_height, log_width, log_console_y, 2);
     write_window(Log_Win, 1, 5, ".......Log....\n");
@@ -122,12 +130,14 @@ WINDOW* UltimaWindows::create_console_window(){
     // the y start for the console and log will be the same as start y
     // otherwise we will move the log and console to the next approppriate y position
     // same as previous, just in case
-    if(start_x == 2){
-        log_console_y = start_y;
-    }
-    else{
-        log_console_y = start_y + thread_height;
-    }
+    // if(start_x == 2){
+    //     log_console_y = start_y;
+    // }
+    // else{
+    //     log_console_y = start_y + thread_height;
+    // }
+
+    log_console_y = 27;
     WINDOW * Console_Win = create_window(console_log_height,console_width, log_console_y, 68);
     write_window(Console_Win, 1, 1, "....Console....\n");
     write_window(Console_Win, 2, 1, "Ultima # ");
@@ -136,6 +146,17 @@ WINDOW* UltimaWindows::create_console_window(){
 
     return Console_Win;
 }
+
+WINDOW* UltimaWindows::create_message_window(){
+
+    WINDOW * Message_Win = create_window(message_height,message_width, message_start_y, message_start_x);
+    write_window(Message_Win, 1, 1, " ------ Message Window ------\n");
+
+    messageWin = Message_Win;
+
+    return Message_Win;
+}
+
 /**************** Write Window **********************************
 Input: Window pointer to write to and specified text to write (char *)
 Output: refreshed window with inputted text
@@ -166,15 +187,15 @@ void UltimaWindows::display_help(WINDOW * Win)
 {
     wclear(Win);
     write_window(Win, 1, 1, "----------- Help -----------");
-    write_window(Win, 2, 1, "1= Kill 1");
-    write_window(Win, 3, 1, "2= Kill 2");
-    write_window(Win, 4, 1, "3= Kill 3");
-    write_window(Win, 5, 1, "d= Dump TCB Table");
-    write_window(Win, 6, 1, "s= Dump Semaphore");
-    write_window(Win, 7, 1, "u= Remove Dead Tasks");
-    write_window(Win, 8, 1, "n= New task in OPEN window");
-    write_window(Win, 9, 1, "l= New task WITHOUT window");
-    write_window(Win, 10, 1, "c= clear screen");
-    write_window(Win, 11, 1, "h= help screen");
-    write_window(Win, 12, 1, "q= Quit");
+    write_window(Win, 2, 1, "k= Kill thread");
+    write_window(Win, 3, 1, "p= Pause and unpause live feed");
+    write_window(Win, 4, 1, "d= Dump TCB Table");
+    write_window(Win, 5, 1, "s= Dump Semaphore");
+    write_window(Win, 6, 1, "u= Remove Dead Tasks");
+    write_window(Win, 7, 1, "n= New task in OPEN window");
+    write_window(Win, 8, 1, "l= New task WITHOUT window");
+    write_window(Win, 9, 1, "c= clear screen");
+    write_window(Win, 10, 1, "h= help screen");
+    write_window(Win, 11, 1, "q= Quit\n");
 }
+

@@ -21,20 +21,26 @@ class UltimaWindows{
         int max_x;
         int max_y;
         int index;
+		int message_start_y;
+        int message_start_x;
+        int message_width;
+        int message_height;
 
     public:
         WINDOW* headingWin;
         WINDOW* logWin;
         WINDOW* consoleWin;
+		WINDOW* messageWin;
         UltimaWindows();
         WINDOW *create_window(int height, int width, int starty, int startx);
         WINDOW* create_thread_window();
         WINDOW* create_heading_win();
         WINDOW* create_log_window();
         WINDOW* create_console_window();
+		WINDOW* create_message_window();
         void write_window(WINDOW * Win, const char* text);
         void write_window(WINDOW * Win, int y, int x, const char* text);
-        void display_help(WINDOW * Win);
+		void display_help(WINDOW * Win);
 
 };
 
