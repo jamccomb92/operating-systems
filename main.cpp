@@ -66,6 +66,7 @@ int main()
 	int nextNewlineRewind = 0;
 	int totalNewlineRewind = 0;
 	int PIDtoKill;
+	int mem_handle = 1;
 
 	sched->start();
 
@@ -108,6 +109,8 @@ int main()
 		{
 		case 'a':
 			memDump = sched->memory_manager->dump();
+			// memDump += sched->memory_manager->Core_Dump();
+
 			for (int i = 0; i < memDump.length(); i++)
 			{
 				winBuff[i] = memDump[i];
@@ -115,6 +118,72 @@ int main()
 			winBuff[memDump.length()] = '\0';
 
 			sched->sched_windows.write_window(sched->sched_windows.logWin, winBuff);
+
+			// for (int iter = 0; iter * 255 - totalNewlineRewind < memDump.length(); iter++)
+			// {
+			// 	for (int i = 0; i < memDump.length() && i < 255; i++)
+			// 	{
+			// 		winBuff[i] = memDump[iter * 255 + i - totalNewlineRewind];
+			// 		nextNewlineRewind++;
+			// 		if (winBuff[i] == '\n')
+			// 		{
+			// 			nextNewlineRewind = 0;
+			// 		}
+			// 	}
+			// 	if (memDump.length() - iter * 256 > 0)
+			// 	{
+			// 		winBuff[255 - nextNewlineRewind] = '\0';
+			// 	}
+			// 	else
+			// 	{
+			// 		winBuff[memDump.length() - iter * 256 - nextNewlineRewind] = '\0';
+			// 	}
+			// 	totalNewlineRewind += nextNewlineRewind;
+			// 	//winBuff[ipcDump.length()] = '\0';
+			// 	sched->sched_windows.write_window(sched->sched_windows.logWin, winBuff);
+			// }
+			// totalNewlineRewind = 0;
+			// nextNewlineRewind = 0;
+			memDump = "";
+
+			break;
+
+		case 'b':
+			sched->memory_manager->Mem_Allocate(128);
+			break;
+		case 'e':
+			sched->memory_manager->Mem_Free(mem_handle);
+			mem_handle++;
+			break;
+		case 'f':
+			memDump = sched->memory_manager->Core_Dump();
+
+			for (int iter = 0; iter * 255 - totalNewlineRewind < memDump.length(); iter++)
+			{
+				for (int i = 0; i < memDump.length() && i < 255; i++)
+				{
+					winBuff[i] = memDump[iter * 255 + i - totalNewlineRewind];
+					nextNewlineRewind++;
+					if (winBuff[i] == '\n')
+					{
+						nextNewlineRewind = 0;
+					}
+				}
+				if (memDump.length() - iter * 256 > 0)
+				{
+					winBuff[255 - nextNewlineRewind] = '\0';
+				}
+				else
+				{
+					winBuff[memDump.length() - iter * 256 - nextNewlineRewind] = '\0';
+				}
+				totalNewlineRewind += nextNewlineRewind;
+				//winBuff[ipcDump.length()] = '\0';
+				sched->sched_windows.write_window(sched->sched_windows.messageWin, winBuff);
+			}
+			totalNewlineRewind = 0;
+			nextNewlineRewind = 0;
+			memDump = "";
 
 			break;
 		case 'd':

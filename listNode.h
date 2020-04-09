@@ -6,12 +6,12 @@ struct node
     int base;
     int limit;
     int memory_handle;
-    bool next_page;
+    // bool next_page;
     // 0 = free, 1 = used
-    int free_used;
+    bool free;
     node *next;
     node *prev;
-    ~node() {}
+    ~node(){};
 };
 
 #endif
