@@ -1,10 +1,21 @@
+/**********************************************************
+Author       : Joe McCombs, Justin Doney, Kamil Kosidlak
+Class        : C435, Spring 2020
+File Name    : main.cc
+Last Updated :
+Description  : Interacts with the scheduler, semaphore,
+               window, and queue classes.
+**********************************************************/
+
 #include "UltimaWindows.h"
 #include "scheduler.h"
 #include "semaphore.h"
+#include "ufs.h"
 
 #include <ncurses.h>
 #include <pthread.h>
 #include <string>
+#include <bitset>
 
 using namespace std;
 
@@ -15,7 +26,7 @@ int main()
 
 	scheduler *sched = new scheduler();
 
-	//UltimaWindows sched->sched_windows;
+	//UltimaWindows sched->;
 
 	sched->create_task("Task 0");
 	WINDOW *W0 = sched->sched_windows.create_thread_window();
@@ -60,14 +71,24 @@ int main()
 	bool pause = false;
 	bool printedDL = false;
 	string semaphoreDump, tcbDump, ipcDump, memDump;
-	int lengthSemDump = 0;
-	//char outSemaphore[256];
-	//char outTCB[256];
 	int nextNewlineRewind = 0;
 	int totalNewlineRewind = 0;
 	int PIDtoKill;
 	int mem_handle = 1;
+	char *write_string = "Test String";
+	char *read_string;
+	int write_to_handle;
 
+	// string filename = "test012";
+	// string filename2 = "test210";
+	// int file_handle = test_ufs->Create_File(0, filename, 128, bitset<4>(0x0), 'B');
+	// test_ufs->Close(0, file_handle);
+	// test_ufs->Change_Permissions(0, filename, bitset<4>(0xf));
+	// //test_ufs->Close(0, file_handle);
+	// int file_handle2 = test_ufs->Create_File(1, filename2, 128, bitset<4>(0x0), 'B');
+	// //test_ufs->Close(0, file_handle2);
+
+	char writech = 'p';
 	sched->start();
 
 	while (input != 'q')
@@ -79,12 +100,14 @@ int main()
 			if (switching)
 			{
 				refresh_table = true;
-				sprintf(winBuff, " PID %d is starting\n", sched->getProcessTable()->getHead()->PID);
+				sprintf(winBuff, " PID %d is starting\n",
+						sched->getProcessTable()->getHead()->PID);
 				sched->sched_windows.write_window(sched->sched_windows.logWin, winBuff);
 			}
 			else
 			{
-				sprintf(winBuff, " PID %d is running\n", sched->getProcessTable()->getHead()->PID);
+				sprintf(winBuff, " PID %d is running\n",
+						sched->getProcessTable()->getHead()->PID);
 				sched->sched_windows.write_window(sched->sched_windows.logWin, winBuff);
 			}
 		}
@@ -107,9 +130,22 @@ int main()
 		gotInput = true;
 		switch (input)
 		{
+		case 'x':
+			sched->file_system->dump();
+			break;
+
+		case 'y':
+			sched->file_system->Dir();
+			break;
+
+		case 'z':
+			sched->file_system->Dir(0);
+			sched->file_system->Dir(1);
+			sched->file_system->Dir(2);
+			break;
+
 		case 'a':
 			memDump = sched->memory_manager->dump();
-			// memDump += sched->memory_manager->Core_Dump();
 
 			for (int i = 0; i < memDump.length(); i++)
 			{
@@ -119,42 +155,38 @@ int main()
 
 			sched->sched_windows.write_window(sched->sched_windows.logWin, winBuff);
 
-			// for (int iter = 0; iter * 255 - totalNewlineRewind < memDump.length(); iter++)
-			// {
-			// 	for (int i = 0; i < memDump.length() && i < 255; i++)
-			// 	{
-			// 		winBuff[i] = memDump[iter * 255 + i - totalNewlineRewind];
-			// 		nextNewlineRewind++;
-			// 		if (winBuff[i] == '\n')
-			// 		{
-			// 			nextNewlineRewind = 0;
-			// 		}
-			// 	}
-			// 	if (memDump.length() - iter * 256 > 0)
-			// 	{
-			// 		winBuff[255 - nextNewlineRewind] = '\0';
-			// 	}
-			// 	else
-			// 	{
-			// 		winBuff[memDump.length() - iter * 256 - nextNewlineRewind] = '\0';
-			// 	}
-			// 	totalNewlineRewind += nextNewlineRewind;
-			// 	//winBuff[ipcDump.length()] = '\0';
-			// 	sched->sched_windows.write_window(sched->sched_windows.logWin, winBuff);
-			// }
-			// totalNewlineRewind = 0;
-			// nextNewlineRewind = 0;
 			memDump = "";
 
 			break;
 
 		case 'b':
-			sched->memory_manager->Mem_Allocate(128);
+			//write_to_handle = sched->memory_manager->Mem_Allocate(128, nullptr);
 			break;
+
 		case 'e':
-			sched->memory_manager->Mem_Free(mem_handle);
-			mem_handle++;
+			//sched->memory_manager->Mem_Free(mem_handle);
+			//mem_handle++;
 			break;
+
+		case 'w':
+			//write_string = "T";
+			//sched->memory_manager->Mem_Write(write_to_handle, write_string);
+			//sched->memory_manager->Mem_Write(write_to_handle, 0, 11, write_string, nullptr);
+			break;
+
+		case 'r':
+			//write_string = "T";
+			//sched->memory_manager->Mem_Read(write_to_handle, 4, 4, read_string, nullptr);
+			winBuff[0] = ' ';
+			for (int i = 0; i < 4; i++)
+			{
+				winBuff[i + 1] = read_string[i];
+			}
+			winBuff[5] = '\n';
+			winBuff[6] = '\0';
+			sched->sched_windows.write_window(sched->sched_windows.messageWin, winBuff);
+			break;
+
 		case 'f':
 			memDump = sched->memory_manager->Core_Dump();
 
@@ -201,20 +233,32 @@ int main()
 
 		case 's':
 			semaphoreDump = sched->io->dump();
-			//semaphoreDump += sched->getProcessTable()->getFirst()->my_mailbox->sema_mailbox->dump();
+			semaphoreDump += sched->getProcessTable()->getFirst()->my_mailbox->sema_mailbox->dump();
 			semaphoreDump += sched->getProcessTable()->getFirst()->next->my_mailbox->sema_mailbox->dump();
-			//semaphoreDump += sched->getProcessTable()->getFirst()->next->next->my_mailbox->sema_mailbox->dump();
-
-			semaphoreDump += "\n";
-			for (int i = 0; i < semaphoreDump.length(); i++)
-			{
-				winBuff[i] = semaphoreDump[i];
-				//outSemaphore[i] = semaphoreDump[i];
-			}
-			winBuff[semaphoreDump.length()] = '\0';
-			//sprintf(winBuff, "%s", outSemaphore);
-			sched->sched_windows.write_window(sched->sched_windows.logWin, winBuff);
-			//fill_n(outSemaphore, semaphoreDump.length(), '\0');
+			semaphoreDump += sched->getProcessTable()->getFirst()->next->next->my_mailbox->sema_mailbox->dump();
+			sched->sched_windows.write_string_window(sched->sched_windows.messageWin,
+													 semaphoreDump);
+			/*
+				for(int iter = 0; iter * 255 - totalNewlineRewind < semaphoreDump.length(); iter++){
+					for(int i = 0; i < semaphoreDump.length() && i < 255; i++){
+						winBuff[i] = semaphoreDump[iter * 255 + i - totalNewlineRewind];
+						nextNewlineRewind++;
+						if(winBuff[i] == '\n'){
+							nextNewlineRewind = 0;
+						}
+					}
+					if(semaphoreDump.length() - iter * 256 > 0){
+						winBuff[255 - nextNewlineRewind] = '\0';
+					}
+					else{
+						winBuff[semaphoreDump.length() - iter * 256 - nextNewlineRewind] = '\0';
+					}
+					totalNewlineRewind += nextNewlineRewind;
+					//winBuff[semaphoreDump.length()] = '\0';
+					sched->sched_windows.write_window(sched->sched_windows.logWin, winBuff);
+				}
+				totalNewlineRewind = 0;
+				nextNewlineRewind = 0;*/
 			break;
 
 		case 't':
@@ -223,6 +267,8 @@ int main()
 
 		case 'm':
 			ipcDump = sched->sched_ipc->ipc_dump();
+			sched->sched_windows.write_string_window(sched->sched_windows.messageWin, ipcDump);
+			/*
 			for (int iter = 0; iter * 255 - totalNewlineRewind < ipcDump.length(); iter++)
 			{
 				for (int i = 0; i < ipcDump.length() && i < 255; i++)
@@ -248,7 +294,7 @@ int main()
 			}
 			totalNewlineRewind = 0;
 			nextNewlineRewind = 0;
-
+			*/
 			break;
 
 		case 'u':
@@ -360,6 +406,8 @@ int main()
 			break;
 
 		case 'q':
+			//test_ufs->Close(1, file_handle2);
+			//test_ufs->Close(0, file_handle);
 			break;
 
 		case ERR:
@@ -367,7 +415,7 @@ int main()
 			break;
 		default:
 			sprintf(winBuff, " This should never happen!\n");
-			sched->sched_windows.write_window(sched->sched_windows.logWin, winBuff);
+			//sched->sched_windows.write_window(sched->sched_windows.logWin, winBuff);
 			break;
 		}
 		//switching = sched->yield();

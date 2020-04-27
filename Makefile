@@ -1,5 +1,5 @@
-ultima: main.o tcb.o scheduler.o semaphore.o UltimaWindows.o ipc.o memoryManager.o
-	g++ -std=c++11 main.o tcb.o scheduler.o semaphore.o UltimaWindows.o ipc.o memoryManager.o -lpthread -lncurses -o ultima
+ultima: main.o tcb.o scheduler.o semaphore.o UltimaWindows.o ipc.o memoryManager.o ufs.o
+	g++ -std=c++11 main.o tcb.o scheduler.o semaphore.o UltimaWindows.o ipc.o memoryManager.o ufs.o -lpthread -lncurses -o ultima
 
 main.o: main.cpp scheduler.h UltimaWindows.h
 	g++ -std=c++11 -c main.cpp
@@ -21,6 +21,9 @@ UltimaWindows.o: UltimaWindows.h UltimaWindows.cc
 
 memoryManager.o: memoryManager.h memoryManager.cc listNode.h
 	g++ -std=c++11 -c memoryManager.cc 
+
+ufs.o: ufs.h ufs.cc inode.h
+	g++ -std=c++11 -c ufs.cc 
 
 clean:
 	rm *.o ultima

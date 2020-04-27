@@ -1,3 +1,11 @@
+/**********************************************************
+Author       : Joe McCombs, Justin Doney, Kamil Kosidlak
+Class        : C435, Spring 2020
+File Name    : scheduler.h
+Last Updated :
+Description  : Header file that defines the scheduler class.
+**********************************************************/
+
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
@@ -9,6 +17,9 @@ class semaphore;
 #include "UltimaWindows.h"
 #include "ipc.h"
 #include "memoryManager.h"
+#include "ufs.h"
+
+class memoryManager;
 
 class scheduler
 {
@@ -26,6 +37,7 @@ public:
 	int nextPID;
 	UltimaWindows sched_windows; // potentially for easier creation
 	memoryManager *memory_manager;
+	ufs *file_system;
 
 	TCB *getProcessTable();
 	scheduler();
